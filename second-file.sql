@@ -1,19 +1,121 @@
-select e.first_name || ' ' || e.last_name as full_name,d.department_name,d.location_id,jh.START_DATE,jh.END_DATE,j.JOB_TITLE
-from employees e join departments d on e.department_id = d.DEPARTMENT_ID
-join JOB_HISTORY jh on e.employee_id = jh.EMPLOYEE_ID
-join jobs j on e.job_id = j.JOB_ID;
+--data types representations
+set SERVEROUTPUT on
+declare
+first_value number := 123;
+second_value varchar2(20) := 'Mahesh';
+third_value date := to_date('23-jan-2023 ','dd-mm-yyyy');
+begin
+dbms_output.put_line(first_value);
+dbms_output.put_line(second_value);
+dbms_output.put_line(third_value);
+end;
+
+--use if statement
+DECLARE
+v_salary number := 10000;
+BEGIN
+  if v_salary > 100000 THEN
+  dbms_output.PUT_LINE('grade A');
+  elsif v_salary BETWEEN 50000 and 100000 then
+  dbms_output.put_line('Grade B');
+  elsif v_salary between 25000 and 50000 THEN
+  dbms_output.PUT_LINE('Grade C');
+  ELSIF v_salary between 10000 and 25000 THEN
+  dbms_output.put_line('Grade D');
+  ELSE
+  dbms_output.PUT_LINE('Grade E');
+end IF;
+end;  
 
 
+--same program using case statement
+set SERVEROUTPUT on
+DECLARE
+SAL NUMBER := 10000;
+BEGIN
+CASE WHEN SAL > 100000 THEN
+DBMS_OUTPUT.PUT_LINE ('Grade A');
+WHEN SAL BETWEEN 50000 AND 100000 THEN
+DBMS_OUTPUT.PUT_LINE ('Grade B');
+WHEN SAL BETWEEN 25000 AND 50000 THEN
+DBMS_OUTPUT.PUT_LINE ('Grade C');
+WHEN SAL BETWEEN 10000 AND 25000 THEN
+DBMS_OUTPUT.PUT_LINE ('Grade D');
+ELSE
+DBMS_OUTPUT.PUT_LINE ('Grade E');
+END CASE;
+END;
+
+--using while loop display the 200 to 300
+DECLARE
+v_number number:= 200;
+BEGIN
+  while v_number <= 300 LOOP
+  DBMS_OUTPUT.PUT_LINE(v_number);
+  v_number := v_number + 1;
+  end loop;
+end;  
 
 
+--using for loop display the 200 to 300
+DECLARE
+i number := 200;
+BEGIN
+  for i in 200..300 loop
+  DBMS_OUTPUT.PUT_LINE(i);
+  end loop;
+end;  
 
+--
+declare
+choice number := 2;
+i number := 300;
+j number := 0;
+BEGIN
+  if choice = 1 THEN
+  LOOP
+    DBMS_OUTPUT.PUT_LINE(i);
+    i:=i+1;
+  end loop;
+  elsif choice = 2 THEN
+  for j in 400..800 loop
+  DBMS_OUTPUT.PUT_LINE(j);
+  end loop;
+  elsif choice = 3 THEN
+  DBMS_OUTPUT.PUT_LINE('WRONG CHOICE');
+  END IF;
+END;
 
-
-
-
-
-
-
-
-
-
+--SALES TABLE RETRIVE THE DATE PARTICULAR ID;
+DECLARE
+S_DATE SALES.SALES_DATE%TYPE;
+S_ORDERID SALES.ORDER_ID%TYPE:=1267;
+S_PRODUCTID SALES.PRODUCT_ID%TYPE;
+S_CUSTOMERID SALES.CUSTOMER_ID%TYPE;
+S_SALESPERSONID SALES.SALESPERSON_ID%TYPE;
+S_QUANTITY SALES.QUANTITY%TYPE;
+S_UNITPRICE SALES.UNIT_PRICE%TYPE;
+S_SALESAMOUNT SALES.SALES_AMOUNT%TYPE;
+S_TAXAMOUNT SALES.TAX_AMOUNT%TYPE;
+S_TOTALAMOUNT SALES.TOTAL_AMOUNT%TYPE;
+BEGIN
+FOR I IN (SELECT SALES_DATE, ORDER_ID, PRODUCT_ID, CUSTOMER_ID, SALESPERSON_ID, QUANTITY,
+UNIT_PRICE, SALES_AMOUNT, TAX_AMOUNT, TOTAL_AMOUNT
+INTO
+S_DATE, S_ORDERID, S_PRODUCTID,S_CUSTOMERID, S_SALESPERSONID, S_QUANTITY,
+S_UNITPRICE, S_SALESAMOUNT, S_TAXAMOUNT, S_TOTALAMOUNT
+FROM SALES
+WHERE ORDER_ID = S_ORDERID) LOOP
+DBMS_OUTPUT.PUT_LINE (I.S_DATE);
+DBMS_OUTPUT.PUT_LINE (I.S_ORDERID);
+DBMS_OUTPUT.PUT_LINE (I.S_PRODUCTID);
+DBMS_OUTPUT.PUT_LINE (I.S_CUSTOMERID);
+DBMS_OUTPUT.PUT_LINE (I.S_SALESPERSONID);
+DBMS_OUTPUT.PUT_LINE (I.S_QUANTITY);
+DBMS_OUTPUT.PUT_LINE (I.S_UNITPRICE);
+DBMS_OUTPUT.PUT_LINE (I.S_SALESAMOUNT);
+DBMS_OUTPUT.PUT_LINE (I.S_TAXAMOUNT);
+DBMS_OUTPUT.PUT_LINE (I.S_TOTALAMOUNT);
+END LOOP;
+END;
+--
