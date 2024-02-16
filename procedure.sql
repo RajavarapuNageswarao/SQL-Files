@@ -111,7 +111,62 @@ BEGIN
 END;
 /
 
---
+--insert the values same values are not comming used in procedure;
+--create a sequence 
+create SEQUENCE my_first_sequence
+INCREMENT by 1
+start with 100
+minvalue 1
+maxvalue 100000
+cycle
+cache 10;
+
+select * from dummy_employees;
+--create a procedure
+create or replace PROCEDURE proc_8
+as
+emp_id number;
+job_ids VARCHAR2(100) := 'IT_PR,IT_DEV,IT_HR'; -- Define job IDs
+job_id_list SYS.ODCIVARCHAR2LIST ; -- Define a list type to hold job IDs
+begin
+    SELECT REGEXP_SUBSTR(job_ids, '[^,]+', 1, LEVEL)
+    BULK COLLECT INTO job_id_list
+    FROM dual
+    CONNECT BY LEVEL <= REGEXP_COUNT(job_ids, ',') + 1;
+for i in 1..5 loop
+select my_first_sequence.nextval into emp_id from dual;
+INSERT INTO dummy_employees (
+            employee_id, 
+            first_name, 
+            last_name, 
+            email, 
+            phone_number, 
+            hire_date, 
+            job_id, 
+            salary, 
+            commission_pct, 
+            manager_id, 
+            department_id
+        )
+        VALUES (
+            emp_id, 
+            'linked'|| ROUND(DBMS_RANDOM.VALUE(1, 100)), -- Add randomness to first_name
+            'list'|| ROUND(DBMS_RANDOM.VALUE(1, 100)),
+            'linked.doe'|| ROUND(DBMS_RANDOM.VALUE(1000, 9999)) ||'@example.com', -- Add randomness to email
+            TO_CHAR(ROUND(DBMS_RANDOM.VALUE(1000000000, 9999999999))), -- Add randomness to phone_number
+            TO_DATE('2025-01-01', 'YYYY-MM-DD') + TRUNC(DBMS_RANDOM.VALUE(0, 365)), -- Add randomness to hire_date within the year 2025
+            job_id_list(TRUNC(DBMS_RANDOM.VALUE(1, job_id_list.COUNT))), 
+            ROUND(DBMS_RANDOM.VALUE(10000, 99999)), -- Add randomness to salary
+            ROUND(DBMS_RANDOM.VALUE(1, 100) * 0.01, 2), -- Add randomness to commission_pct
+            ROUND(DBMS_RANDOM.VALUE(100, 200)), -- Add randomness to manager_id
+            ROUND(DBMS_RANDOM.VALUE(10, 90)) -- Add randomness to department_id
+        );
+    END LOOP;
+END;
+
+execute proc_8;    
+
+select * from dummy_employees;
 
 
 
