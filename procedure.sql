@@ -168,5 +168,64 @@ execute proc_8;
 
 select * from dummy_employees;
 
+--same model another code;
+--create sequnce for used for procedure
+create SEQUENCE Third_sequence
+increment by 1
+start with 10
+minvalue 1
+maxvalue 1000000
+cycle
+cache 10;
+
+---create procedure
+CREATE OR REPLACE PROCEDURE proc_11 AS
+    emp_id NUMBER;
+    job_ids VARCHAR2(200) := 'IT,HR,HCM,HRM';
+    job_list SYS.ODCIVARCHAR2LIST;
+BEGIN
+    -- Split the job_ids string into individual job IDs and store them in job_list
+    SELECT REGEXP_SUBSTR(job_ids, '[^,]+', 1, LEVEL)
+    BULK COLLECT INTO job_list
+    FROM dual
+    CONNECT BY LEVEL <= REGEXP_COUNT(job_ids, ',') + 1;
+
+    FOR i IN 1..10 LOOP
+        SELECT Third_sequence.nextval INTO emp_id FROM dual;
+
+        INSERT INTO dummy_employees (
+            employee_id,
+            first_name,
+            last_name,
+            email,
+            phone_number,
+            hire_date,
+            job_id,
+            salary,
+            commission_pct,
+            manager_id,
+            department_id
+        ) VALUES (
+            emp_id,
+            'linked' || ROUND(DBMS_RANDOM.VALUE(1, 10000)) || 'list',
+            'lost' || ROUND(DBMS_RANDOM.VALUE(1, 10000)) || 'list',
+            'linked' || ROUND(DBMS_RANDOM.VALUE(1, 100000)) || '@gmail.com',
+            TO_CHAR(ROUND(DBMS_RANDOM.VALUE(11111, 99999))),
+            TO_DATE('2023-01-01', 'YYYY-MM-DD') + TRUNC(DBMS_RANDOM.VALUE(0, 365)), -- Generate hire date within the year 2023
+            job_list(TRUNC(DBMS_RANDOM.VALUE(1, job_list.COUNT))),
+            ROUND(DBMS_RANDOM.VALUE(10000, 99999)),
+            ROUND(DBMS_RANDOM.VALUE(1, 100) * 0.1, 2),
+            ROUND(DBMS_RANDOM.VALUE(100, 9999)),
+            ROUND(DBMS_RANDOM.VALUE(1, 9999))
+        );
+    END LOOP;
+    COMMIT;
+END;
+/
+
+execute proc_11;
+select * from dummy_employees
+order by employee_id;
+
 
 
